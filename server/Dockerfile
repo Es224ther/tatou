@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir -e .
 
 # Copy sources after dependencies installation
 COPY src /app/src
+COPY flag /app/flag
 RUN pip install --no-cache-dir -e .
 
 EXPOSE 5000
