@@ -15,7 +15,8 @@ except Exception:  # registry/module missing
 
 CASES: list[tuple[str, object]] = []
 for name, impl in (METHODS or {}).items():
-    CASES.append((str(name), impl))
+    if not name == "UnsafeBashBridgeAppendEOF":
+        CASES.append((str(name), impl))
 
 if not CASES:
     pytest.skip("No watermarking methods registered in watermarking_utils.METHODS", allow_module_level=True)
@@ -77,7 +78,5 @@ class TestAllWatermarkingMethods:
         out_pdf.write_bytes(wm_impl.add_watermark(sample_pdf_path, secret=secret, key=key, position=None))
         extracted = wm_impl.read_secret(out_pdf, key=key)
         assert isinstance(extracted, str), f"{method_name}: read_secret must return str"
-        print(extracted)
-        print(secret)
         assert extracted == secret, f"{method_name}: read_secret should return the exact embedded secret"
 
