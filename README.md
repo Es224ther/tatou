@@ -11,7 +11,7 @@ To clone the repo, you can simply run:
 git clone https://github.com/nharrand/tatou.git
 ```
 
-Note that you should probably for the repo and clone your own repo.
+Note that you should probably fork the repo and clone your own repo.
 
 
 ### Run python unit tests
