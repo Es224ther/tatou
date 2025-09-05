@@ -3,6 +3,8 @@ A web platform for pdf watermarking. This project is intended for pedagogical us
 
 ## Instructions
 
+THe following instructions are meant for a bash terminal on a Linux machine. If you are using something else, you will need to adapt them.
+
 To clone the repo, you can simply run:
 
 ```bash
