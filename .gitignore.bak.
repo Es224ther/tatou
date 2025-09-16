@@ -206,26 +206,3 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 deploy/secrets/flag2
-
-# --- dotenv / secrets ---
-.env
-.env.*
-*.env
-**/.env
-!/.env.example
-
-# --- course flags / secrets ---
-tatou/flag
-deploy/secrets/**
-
-# --- Python junk ---
-__pycache__/
-*.py[cod]
-*.egg-info/
-.venv/
-venv/
-
-# --- OS / editors ---
-.DS_Store
-.idea/
-.vscode/

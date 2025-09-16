@@ -1,4 +1,4 @@
-version: "3.9"
+
 
 services:
   server:
@@ -9,6 +9,7 @@ services:
       - "5000:5000"
     volumes:
       - user-files:/app/storage
+      - ./deploy/secrets/flag2:/app/flag:ro
     environment:
       - PYTHONUNBUFFERED=1
       # DB connection details for future use by the API
