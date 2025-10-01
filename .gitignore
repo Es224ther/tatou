@@ -216,6 +216,7 @@ deploy/secrets/flag2
 
 # --- course flags / secrets ---
 tatou/flag
+tatou/server/flag
 deploy/secrets/**
 
 # --- Python junk ---
@@ -229,3 +230,4 @@ venv/
 .DS_Store
 .idea/
 .vscode/
+/flag
