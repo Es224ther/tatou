@@ -2,6 +2,8 @@
 
 services:
   server:
+    env_file:
+      - .env
     build:
       context: server
       dockerfile: Dockerfile
@@ -10,6 +12,8 @@ services:
     volumes:
       - user-files:/app/storage
       - ./deploy/secrets/flag2:/app/flag:ro
+      - ./deploy/secrets/clients:/app/secrets/clients:ro
+      - ./deploy/secrets/server:/app/secrets/server:ro
     environment:
       - PYTHONUNBUFFERED=1
       # DB connection details for future use by the API
@@ -18,6 +22,9 @@ services:
       - DB_NAME=tatou
       - DB_USER=${MARIADB_USER}
       - DB_PASSWORD=${MARIADB_PASSWORD}
+      - RMAP_SERVER_PRIVATE=/app/secrets/server/server_priv.asc
+      - RMAP_SERVER_PUBLIC=/app/secrets/server/server_pub.asc
+      - RMAP_CLIENT_KEYS_DIR=/app/secrets/clients
     depends_on:
       db:
         condition: service_healthy

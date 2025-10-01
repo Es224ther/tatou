@@ -43,15 +43,21 @@ from watermarking_method import (
 )
 from add_after_eof import AddAfterEOF
 from unsafe_bash_bridge_append_eof import UnsafeBashBridgeAppendEOF
-
+from invisible_text_watermark import InvisibleTextWatermark
+from embed_attachment import EmbedAttachment
+from xmp_metadata_method import XmpMetadataMethod
 # --------------------
 # Method registry
 # --------------------
 
 METHODS: Dict[str, WatermarkingMethod] = {
     AddAfterEOF.name: AddAfterEOF(),
-    UnsafeBashBridgeAppendEOF.name: UnsafeBashBridgeAppendEOF()
+    UnsafeBashBridgeAppendEOF.name: UnsafeBashBridgeAppendEOF(),
+    InvisibleTextWatermark.name: InvisibleTextWatermark(),
+    EmbedAttachment.name:EmbedAttachment(),
+    XmpMetadataMethod.name:XmpMetadataMethod(),
 }
+
 """Registry of available watermarking methods.
 
 Keys are human-readable method names (stable, lowercase, hyphenated)

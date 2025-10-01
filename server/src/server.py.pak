@@ -1,12 +1,10 @@
 import os
 import io
 import hashlib
-import secrets
 import datetime as dt
 from pathlib import Path
 from functools import wraps
-from watermarking.xmp_create import write_xmp
-from watermarking.xmp_read import read_xmp
+
 from flask import Flask, jsonify, request, g, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -24,9 +22,8 @@ except Exception:  # dill is optional
 
 import watermarking_utils as WMUtils
 from watermarking_method import WatermarkingMethod
-from rmap_route import rmap_bp
 #from watermarking_utils import METHODS, apply_watermark, read_watermark, explore_pdf, is_watermarking_applicable, get_method
-
+from rmap_route import bp as rmap_bp
 def create_app():
     app = Flask(__name__)
 
@@ -542,11 +539,9 @@ def create_app():
             doc_id = int(doc_id)
         except (TypeError, ValueError):
             return jsonify({"error": "document_id (int) is required"}), 400
-        if not method or not intended_for:
-            return jsonify({"error": "method, intended_for are required"}), 400
+        if not method or not intended_for or not isinstance(secret, str) or not isinstance(key, str):
+            return jsonify({"error": "method, intended_for, secret, and key are required"}), 400
 
-        if method != "xmp" and (not isinstance(secret, str) or not isinstance(key, str)):
-            return jsonify({"error": "secret, and key are required for this method"}), 400
         # lookup the document; enforce ownership
         try:
             with get_engine().connect() as conn:
@@ -577,70 +572,6 @@ def create_app():
             return jsonify({"error": "document path invalid"}), 500
         if not file_path.exists():
             return jsonify({"error": "file missing on disk"}), 410
-
-        # --- XMP branch (write metadata into PDF, then insert into DB and return) ---
-        if method == "xmp":
-            # Construct output filename (keep consistent with existing naming convention)
-            base_name = Path(row.name or file_path.name).stem
-            intended_slug = secure_filename(intended_for)
-            dest_dir = file_path.parent / "watermarks"
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            candidate = f"{base_name}__{intended_slug}.pdf"
-            dest_path = dest_dir / candidate
-
-            try:
-                # Write XMP watermark; message is optional and fetched from request payload
-                rec = write_xmp(
-                    input_pdf=str(file_path),
-                    output_pdf=str(dest_path),
-                    issuer=os.environ.get("GROUP_NAME", "Group 8"),
-                    recipient=intended_for,
-                    message=(payload.get("message") or None)
-                )
-            except Exception as e:
-                return jsonify({"error": f"XMP watermarking failed: {e}"}), 500
-
-            # Generate link (same as current scheme: sha1(filename))
-            link_token = hashlib.sha1(candidate.encode("utf-8")).hexdigest()
-
-            try:
-                with get_engine().begin() as conn:
-                    conn.execute(
-                        text("""
-                            INSERT INTO Versions (documentid, link, intended_for, secret, method, position, path)
-                            VALUES (:documentid, :link, :intended_for, :secret, :method, :position, :path)
-                        """),
-                        {
-                            "documentid": doc_id,
-                            "link": link_token,
-                            "intended_for": intended_for,
-                            # For XMP, we use versionId as the traceable secret stored in the DB
-                            "secret": rec.get("versionId", ""),
-                            "method": "xmp",
-                            "position": "",
-                            "path": dest_path
-                        },
-                    )
-                    vid = int(conn.execute(text("SELECT LAST_INSERT_ID()")).scalar())
-            except Exception as e:
-                try:
-                    # Attempt to clean up generated file if DB insertion fails
-                    dest_path.unlink(missing_ok=True)
-                except Exception:
-                    pass
-                return jsonify({"error": f"Database error during version insert: {e}"}), 503
-
-            return jsonify({
-                "id": vid,
-                "documentid": doc_id,
-                "link": link_token,
-                "intended_for": intended_for,
-                "method": "xmp",
-                "position": "",
-                "filename": candidate,
-                "size": int(dest_path.stat().st_size),
-            }), 201
-        # --- end XMP branch ---
 
         # check watermark applicability
         try:
@@ -830,11 +761,9 @@ def create_app():
             doc_id = int(doc_id)
         except (TypeError, ValueError):
             return jsonify({"error": "document_id (int) is required"}), 400
-        if not method:
-            return jsonify({"error": "method is required"}), 400
+        if not method or not isinstance(key, str):
+            return jsonify({"error": "method, and key are required"}), 400
 
-        if method != "xmp" and not isinstance(key, str):
-            return jsonify({"error": "key is required for this method"}), 400
         # lookup the document; FIXME enforce ownership
         try:
             with get_engine().connect() as conn:
@@ -864,29 +793,7 @@ def create_app():
             return jsonify({"error": "document path invalid"}), 500
         if not file_path.exists():
             return jsonify({"error": "file missing on disk"}), 410
-        # --- XMP branch (read & verify metadata signature) ---
-        if method == "xmp":
-            try:
-                res = read_xmp(str(file_path))
-            except Exception as e:
-                return jsonify({"error": f"XMP read failed: {e}"}), 400
-
-            if not res.get("ok"):
-                return jsonify({
-                    "error": res.get("error", "xmp-read-failed"),
-                    "detail": res.get("record")
-                }), 400
-
-            # Reuse your existing return format; return versionId as the secret
-            return jsonify({
-                "documentid": doc_id,
-                "secret": res["record"].get("versionId"),
-                "method": "xmp",
-                "position": ""
-            }), 201
-        # --- end XMP branch ---
-
-
+        
         secret = None
         try:
             secret = WMUtils.read_watermark(
@@ -902,8 +809,9 @@ def create_app():
             "method": method,
             "position": position
         }), 201
+    
     app.register_blueprint(rmap_bp)
-    return app    
+    return app
     
 
 # WSGI entrypoint

@@ -16,6 +16,9 @@ COPY pyproject.toml /app/pyproject.toml
 # Install runtime dependencies
 RUN pip install --no-cache-dir -e .
 
+# Install pikepdf for EmbedAttachment
+RUN pip install --no-cache-dir pikepdf
+
 # Copy sources after dependencies installation
 COPY src /app/src
 COPY flag /app/flag

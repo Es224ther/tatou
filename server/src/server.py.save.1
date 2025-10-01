@@ -1,12 +1,12 @@
 import os
 import io
 import hashlib
-import secrets
 import datetime as dt
+import json
+import secrets
 from pathlib import Path
 from functools import wraps
-from watermarking.xmp_create import write_xmp
-from watermarking.xmp_read import read_xmp
+
 from flask import Flask, jsonify, request, g, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,6 +14,11 @@ from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import IntegrityError
+from blindwm import (
+    create_pdf_with_blind_wm,
+    extract_blind_wm_from_pdf,
+    BlindWMParams,
+)
 
 import pickle as _std_pickle
 try:
@@ -24,7 +29,6 @@ except Exception:  # dill is optional
 
 import watermarking_utils as WMUtils
 from watermarking_method import WatermarkingMethod
-from rmap_route import rmap_bp
 #from watermarking_utils import METHODS, apply_watermark, read_watermark, explore_pdf, is_watermarking_applicable, get_method
 
 def create_app():
@@ -42,6 +46,33 @@ def create_app():
     app.config["DB_NAME"] = os.environ.get("DB_NAME", "tatou")
 
     app.config["STORAGE_DIR"].mkdir(parents=True, exist_ok=True)
+
+    # === Blind WM method config ===
+    app.config.setdefault("WM_HMAC_KEY", os.environ.get("WM_HMAC_KEY", "dev-change-me").encode("utf-8"))
+    app.config.setdefault("WM_OUT_DIR", (Path(os.environ.get("WM_OUT_DIR", "./storage/versions")).resolve()))
+    app.config.setdefault("WM_PARAMS", BlindWMParams(password_img=1, password_wm=1, dpi=200, target_pages="first"))
+    app.config["WM_OUT_DIR"].mkdir(parents=True, exist_ok=True)
+
+    def _save_watermarked_version(*, doc_id:int, link:str, intended_for:str,secret:str, method:str, position:str, out_pdf:Path,wm_len:int, doc_hmac:str, params:dict):
+        size = out_pdf.stat().st_size
+        filename = out_pdf.name
+        with get_engine().begin() as conn:
+            conn.execute(text("""INSERT INTO Versions(documentid, link, method, position, intended_for, filename, size, doc_hmac, wm_len, params_json, created_at)
+                VALUES(:docid, :link, 'blind_wm_v1', 'page_image', :intended_for, :filename, :size, :doc_hmac, :wm_len, :params, NOW())"""),
+                dict(docid=doc_id, link=link, intended_for=intended_for, 
+                     secret=secret, method-method, position=position,
+                     path=str(out_pdf), filename=filename, size=size, doc_hmac=doc_hmac,
+                     wm_len=wm_len, params=json.dumps(params or {})))
+
+    def _get_version_meta_by_link(*, doc_id:int, link:str):
+        with get_engine().begin() as conn:
+            row = conn.execute(text("""
+                SELECT v.filename, v.wm_len
+                FROM versions v
+                WHERE v.documentid = :docid AND v.link = :link
+                LIMIT 1
+            """), {"id": doc_id, "link": link}).mappings().first()
+        return row
 
     # --- DB engine only (no Table metadata) ---
     def db_url() -> str:
@@ -139,6 +170,101 @@ def create_app():
         return jsonify({"id": row.id, "email": row.email, "login": row.login}), 201
 
     # POST /api/login {login, password}
+    @app.post("/create-watermark/<int:doc-id> ")
+    @require_auth
+    def create_watermark(doc_id):
+        payload = request.get_json(silent=True) or {}
+        intended_for = payload.get("intended_for", f"uid-{g.user['id']}")
+
+        # 1) Review the document and perform the owner verification
+        with get_engine().begin() as conn:
+            doc = conn.execute(text("""
+                SELECT id, owner_id, filename FROM documents WHERE id=:id
+            """), {"id": doc_id}).mappings().first()
+
+        if not doc or doc["owner_id"] != g.user["id"]:
+            return jsonify({"error": "Document not found or access denied"}), 404
+
+        src_pdf = (app.config["STORAGE_DIR"] / "documents" / doc["filename"]).resolve()
+        if not src_pdf.exists():
+            return jsonify({"error": f"Source PDF not found: {src_pdf}"}), 400
+
+        # 2) Generate the link for this version.
+        link = payload.get("link") or secrets.token_hex(16)
+        out_pdf = app.config["WM_OUT_DIR"] / f"{link}.pdf"
+
+        # 3) Invoke the blind watermarking method
+        res = create_pdf_with_blind_wm(
+            input_pdf=src_pdf,
+            output_pdf=out_pdf,
+            secret_plain=link,
+            intended_for=intended_for,
+            hmac_key=app.config["WM_HMAC_KEY"],
+            params=app.config["WM_PARAMS"],
+        )
+
+        # 4) Save the watermarked version
+        _save_watermarked_version(
+            doc_id=doc_id,
+            link=link,
+            intended_for=intended_for,
+            out_pdf=out_pdf,
+            wm_len=res.wm_len,
+            doc_hmac=res.doc_hmac,
+            params={"dpi": app.config["WM_PARAMS"].dpi,"target_pages": app.config["WM_PARAMS"].target_pages,},
+        )
+
+        return jsonify({
+            "documentid": doc_id,
+            "link": link,
+            "method": "blind_wm_v1",
+            "position": "page_image",
+            "filename": out_pdf.name,
+            "size": out_pdf.stat().st_size,
+            "intended_for": intended_for
+        }), 200
+
+    @app.post("/read-watermark/<int:doc-id> ")
+    @require_auth
+    def read_watermark(doc_id):
+        payload = request.get_json(silent=True) or {}
+        link = payload.get("link")
+        if not link:
+            return jsonify({"error": "missing 'link'"}), 400
+
+        # 1) Verify version ownership & get filename and wm_len
+        with get_engine().begin() as conn:
+            row = conn.execute(text("""
+                SELECT v.filename, v.wm_len, d.owner_id
+                FROM versions v
+                JOIN documents d ON d.id = v.documentid
+                WHERE v.documentid = :docid AND v.link = :link
+                LIMIT 1
+            """), {"docid": doc_id, "link": link}).mappings().first()
+
+        if not row or row["owner_id"] != g.user["id"]:
+            return jsonify({"error": "Version not found or access denied"}), 404
+
+        pdf_path = (app.config["WM_OUT_DIR"] / row["filename"]).resolve()
+        if not pdf_path.exists():
+            return jsonify({"error": f"PDF missing on disk: {pdf_path}"}), 404
+
+        secret = extract_blind_wm_from_pdf(
+            input_pdf=pdf_path,
+            wm_len=int(row["wm_len"]),
+            params=app.config["WM_PARAMS"],
+        )
+        if not secret:
+            return jsonify({"error": "cannot extract watermark"}), 400
+
+        return jsonify({
+            "documentid": doc_id,
+            "link": link,
+            "method": "blind_wm_v1",
+            "position": "page_image",
+            "secret": secret
+        }), 200
+
     @app.post("/api/login")
     def login():
         payload = request.get_json(silent=True) or {}
@@ -163,6 +289,7 @@ def create_app():
         return jsonify({"token": token, "token_type": "bearer", "expires_in": app.config["TOKEN_TTL_SECONDS"]}), 200
 
     # POST /api/upload-document  (multipart/form-data)
+
     @app.post("/api/upload-document")
     @require_auth
     def upload_document():
@@ -542,11 +669,9 @@ def create_app():
             doc_id = int(doc_id)
         except (TypeError, ValueError):
             return jsonify({"error": "document_id (int) is required"}), 400
-        if not method or not intended_for:
-            return jsonify({"error": "method, intended_for are required"}), 400
+        if not method or not intended_for or not isinstance(secret, str) or not isinstance(key, str):
+            return jsonify({"error": "method, intended_for, secret, and key are required"}), 400
 
-        if method != "xmp" and (not isinstance(secret, str) or not isinstance(key, str)):
-            return jsonify({"error": "secret, and key are required for this method"}), 400
         # lookup the document; enforce ownership
         try:
             with get_engine().connect() as conn:
@@ -577,70 +702,6 @@ def create_app():
             return jsonify({"error": "document path invalid"}), 500
         if not file_path.exists():
             return jsonify({"error": "file missing on disk"}), 410
-
-        # --- XMP branch (write metadata into PDF, then insert into DB and return) ---
-        if method == "xmp":
-            # Construct output filename (keep consistent with existing naming convention)
-            base_name = Path(row.name or file_path.name).stem
-            intended_slug = secure_filename(intended_for)
-            dest_dir = file_path.parent / "watermarks"
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            candidate = f"{base_name}__{intended_slug}.pdf"
-            dest_path = dest_dir / candidate
-
-            try:
-                # Write XMP watermark; message is optional and fetched from request payload
-                rec = write_xmp(
-                    input_pdf=str(file_path),
-                    output_pdf=str(dest_path),
-                    issuer=os.environ.get("GROUP_NAME", "Group 8"),
-                    recipient=intended_for,
-                    message=(payload.get("message") or None)
-                )
-            except Exception as e:
-                return jsonify({"error": f"XMP watermarking failed: {e}"}), 500
-
-            # Generate link (same as current scheme: sha1(filename))
-            link_token = hashlib.sha1(candidate.encode("utf-8")).hexdigest()
-
-            try:
-                with get_engine().begin() as conn:
-                    conn.execute(
-                        text("""
-                            INSERT INTO Versions (documentid, link, intended_for, secret, method, position, path)
-                            VALUES (:documentid, :link, :intended_for, :secret, :method, :position, :path)
-                        """),
-                        {
-                            "documentid": doc_id,
-                            "link": link_token,
-                            "intended_for": intended_for,
-                            # For XMP, we use versionId as the traceable secret stored in the DB
-                            "secret": rec.get("versionId", ""),
-                            "method": "xmp",
-                            "position": "",
-                            "path": dest_path
-                        },
-                    )
-                    vid = int(conn.execute(text("SELECT LAST_INSERT_ID()")).scalar())
-            except Exception as e:
-                try:
-                    # Attempt to clean up generated file if DB insertion fails
-                    dest_path.unlink(missing_ok=True)
-                except Exception:
-                    pass
-                return jsonify({"error": f"Database error during version insert: {e}"}), 503
-
-            return jsonify({
-                "id": vid,
-                "documentid": doc_id,
-                "link": link_token,
-                "intended_for": intended_for,
-                "method": "xmp",
-                "position": "",
-                "filename": candidate,
-                "size": int(dest_path.stat().st_size),
-            }), 201
-        # --- end XMP branch ---
 
         # check watermark applicability
         try:
@@ -830,11 +891,9 @@ def create_app():
             doc_id = int(doc_id)
         except (TypeError, ValueError):
             return jsonify({"error": "document_id (int) is required"}), 400
-        if not method:
-            return jsonify({"error": "method is required"}), 400
+        if not method or not isinstance(key, str):
+            return jsonify({"error": "method, and key are required"}), 400
 
-        if method != "xmp" and not isinstance(key, str):
-            return jsonify({"error": "key is required for this method"}), 400
         # lookup the document; FIXME enforce ownership
         try:
             with get_engine().connect() as conn:
@@ -864,29 +923,7 @@ def create_app():
             return jsonify({"error": "document path invalid"}), 500
         if not file_path.exists():
             return jsonify({"error": "file missing on disk"}), 410
-        # --- XMP branch (read & verify metadata signature) ---
-        if method == "xmp":
-            try:
-                res = read_xmp(str(file_path))
-            except Exception as e:
-                return jsonify({"error": f"XMP read failed: {e}"}), 400
-
-            if not res.get("ok"):
-                return jsonify({
-                    "error": res.get("error", "xmp-read-failed"),
-                    "detail": res.get("record")
-                }), 400
-
-            # Reuse your existing return format; return versionId as the secret
-            return jsonify({
-                "documentid": doc_id,
-                "secret": res["record"].get("versionId"),
-                "method": "xmp",
-                "position": ""
-            }), 201
-        # --- end XMP branch ---
-
-
+        
         secret = None
         try:
             secret = WMUtils.read_watermark(
@@ -902,8 +939,8 @@ def create_app():
             "method": method,
             "position": position
         }), 201
-    app.register_blueprint(rmap_bp)
-    return app    
+
+    return app
     
 
 # WSGI entrypoint

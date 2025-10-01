@@ -45,6 +45,9 @@ CREATE TABLE IF NOT EXISTS `Versions` (
   `secret` VARCHAR(320) NOT NULL,              -- secret
   `method` VARCHAR(32) NOT NULL,               -- e.g., "text_overlay"
   `position` TEXT,               -- e.g., "text_overlay"
+  `wm_len` INT NULL,
+  `doc_hmac` CHAR(64) NULL,
+  `params_json` JSON NULL,
   `path` VARCHAR(320) NOT NULL,              -- secret
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_Versions_link` (`link`),
@@ -54,3 +57,7 @@ CREATE TABLE IF NOT EXISTS `Versions` (
     ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+ALTER TABLE `Versions`
+  ADD COLUMN IF NOT EXISTS `wm_len` INT NULL,
+  ADD COLUMN IF NOT EXISTS `doc_hmac` CHAR(64) NULL,
+  ADD COLUMN IF NOT EXISTS `params_json` JSON NULL;

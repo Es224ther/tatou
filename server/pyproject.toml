@@ -5,11 +5,18 @@ description = "PDF Watermarking platform"
 requires-python = ">=3.11"
 dependencies = [
 	"PyMuPDF>=1.21.1",
+        "Pillow>=10.4.0",
+        "numpy>=1.26.4",
+        "opencv-python>=4.10.0.84",
+        "blind-watermark==0.4.4",
+        "Werkzeug>=3",
 	"Flask==3.0.3",
 	"gunicorn==21.2.0",
 	"PyMySQL==1.1.2",
 	"SQLAlchemy==2.0.43",
 	"dill==0.4.0",
+        "pikepdf>=8.9.0",
+        "cryptography>=42.0.0",
 	"rmap @ git+https://github.com/nharrand/RMAP-Server.git@v1.0.0"
 ]
 
