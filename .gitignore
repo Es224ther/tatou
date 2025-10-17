@@ -231,3 +231,7 @@ venv/
 .idea/
 .vscode/
 /flag
+# ---test and coverage outputs---
+.coverage
+htmlcov/
+.mutmut/yaml
