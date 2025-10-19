@@ -218,6 +218,8 @@ deploy/secrets/flag2
 tatou/flag
 tatou/server/flag
 deploy/secrets/**
+**/secrets/**
+*.asc
 
 # --- Python junk ---
 __pycache__/
@@ -235,3 +237,4 @@ venv/
 .coverage
 htmlcov/
 .mutmut/yaml
+/secrets/

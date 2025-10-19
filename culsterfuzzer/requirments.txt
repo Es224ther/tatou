@@ -1,0 +1,6 @@
+schemathesis[checks]==3.19.0
+hypothesis==6.90.0
+requests
+PyYAML
+python-dotenv
+

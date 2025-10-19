@@ -1,0 +1,19 @@
+Collecting pikepdf
+  Using cached pikepdf-9.11.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.2 kB)
+Collecting Pillow>=10.0.1 (from pikepdf)
+  Using cached pillow-11.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.0 kB)
+Collecting Deprecated (from pikepdf)
+  Using cached Deprecated-1.2.18-py2.py3-none-any.whl.metadata (5.7 kB)
+Collecting lxml>=4.8 (from pikepdf)
+  Using cached lxml-6.0.2-cp311-cp311-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl.metadata (3.6 kB)
+Requirement already satisfied: packaging in ./.venv/lib/python3.11/site-packages (from pikepdf) (25.0)
+Collecting wrapt<2,>=1.10 (from Deprecated->pikepdf)
+  Using cached wrapt-1.17.3-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.4 kB)
+Using cached pikepdf-9.11.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (2.6 MB)
+Using cached lxml-6.0.2-cp311-cp311-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl (5.2 MB)
+Using cached pillow-11.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.6 MB)
+Using cached Deprecated-1.2.18-py2.py3-none-any.whl (10.0 kB)
+Using cached wrapt-1.17.3-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (82 kB)
+Installing collected packages: wrapt, Pillow, lxml, Deprecated, pikepdf
+
+Successfully installed Deprecated-1.2.18 Pillow-11.3.0 lxml-6.0.2 pikepdf-9.11.0 wrapt-1.17.3

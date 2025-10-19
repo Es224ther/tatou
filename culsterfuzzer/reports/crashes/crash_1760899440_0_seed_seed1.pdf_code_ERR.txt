@@ -1,0 +1,4 @@
+timestamp=1760899440
+iteration=0
+seed=seed1.pdf
+status=None

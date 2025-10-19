@@ -1,0 +1,23 @@
+test@example.com
+"test@example.comtest@example.com"
+test@@example.com
+test@ex"ample.com
+test@exam\nple.com
+test@例子.公司
+test@☃.net
+test@localhost
+test@127.0.0.1
+user@%s.com
+user@{{7*7}}.com
+user@<script>alert(1)</script>.com
+user@' OR '1'='1
+user@admin'--
+user@../../../../etc/passwd
+user@NULL
+user@None
+user@
+12345
+<xml>
+空
+null
+🧨🧨🧨

@@ -1,0 +1,75 @@
+0		400	44
+1	# 常见 email 畸形输入	401	32
+2		400	44
+3	[test@example.com](mailto:test@example.com)	401	32
+4	"[test@example.comtest@example.com](mailto:test@example.com)"	401	32
+5	test@@example.com	401	32
+6	test@ex"[ample.com](http://ample.com/)	401	32
+7	test@exam\[nple.com](http://nple.com/)	401	32
+8	test@例子.公司	401	32
+9	[test@☃.net](mailto:test@xn--n3h.net)	401	32
+10	test@localhost	401	32
+11	[test@127.0.0.1](mailto:test@127.0.0.1)	401	32
+12	user@%[s.com](http://s.com/)	401	32
+13	user@{{7*7}}.com	401	32
+14	user@<script>alert(1)</script>.com	401	32
+15	user@' OR '1'='1	401	32
+16	user@admin'--	401	32
+17	user@../../../../etc/passwd	401	32
+18	user@NULL	401	32
+19	user@None	401	32
+20	user@	401	32
+21	12345	401	32
+22	<xml>	401	32
+23	空	401	32
+24	null	401	32
+25	🧨🧨🧨	401	32
+0		400	44
+1	# 常见 email 畸形输入	401	32
+2		400	44
+3	[test@example.com](mailto:test@example.com)	401	32
+4	"[test@example.comtest@example.com](mailto:test@example.com)"	401	32
+5	test@@example.com	401	32
+6	test@ex"[ample.com](http://ample.com/)	401	32
+7	test@exam\[nple.com](http://nple.com/)	401	32
+8	test@例子.公司	401	32
+9	[test@☃.net](mailto:test@xn--n3h.net)	401	32
+10	test@localhost	401	32
+11	[test@127.0.0.1](mailto:test@127.0.0.1)	401	32
+12	user@%[s.com](http://s.com/)	401	32
+13	user@{{7*7}}.com	401	32
+14	user@<script>alert(1)</script>.com	401	32
+15	user@' OR '1'='1	401	32
+16	user@admin'--	401	32
+17	user@../../../../etc/passwd	401	32
+18	user@NULL	401	32
+19	user@None	401	32
+20	user@	401	32
+21	12345	401	32
+22	<xml>	401	32
+23	空	401	32
+24	null	401	32
+25	🧨🧨🧨	401	32
+1760878685	0	401	32	test@example.com
+1760878685	1	401	32	"test@example.comtest@example.com"
+1760878685	2	401	32	test@@example.com
+1760878685	3	401	32	test@ex"ample.com
+1760878685	4	401	32	test@exam\nple.com
+1760878685	5	401	32	test@例子.公司
+1760878686	6	401	32	test@☃.net
+1760878686	7	401	32	test@localhost
+1760878686	8	401	32	test@127.0.0.1
+1760878686	9	401	32	user@%s.com
+1760878686	10	401	32	user@{{7*7}}.com
+1760878686	11	401	32	user@<script>alert(1)</script>.com
+1760878686	12	401	32	user@' OR '1'='1
+1760878686	13	401	32	user@admin'--
+1760878686	14	401	32	user@../../../../etc/passwd
+1760878686	15	401	32	user@NULL
+1760878687	16	401	32	user@None
+1760878687	17	401	32	user@
+1760878687	18	401	32	12345
+1760878687	19	401	32	<xml>
+1760878687	20	401	32	空
+1760878687	21	401	32	null
+1760878687	22	401	32	🧨🧨🧨

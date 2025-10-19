@@ -1,0 +1,8 @@
+timestamp=1760899862
+iteration=195
+seed=seed1.pdf
+status=401
+
+--- response preview ---
+{"error":"Missing or invalid Authorization header"}
+

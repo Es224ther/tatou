@@ -1,0 +1,290 @@
+openapi: 3.0.0
+info:
+  title: Tatou API (derived)
+  version: "1.0.0"
+servers:
+  - url: http://127.0.0.1:5000
+paths:
+  /api/healthz:
+    get:
+      summary: healthz
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /api/create-user:
+    post:
+      summary: create-user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login,password,email]
+              properties:
+                login: { type: string }
+                password: { type: string }
+                email: { type: string, format: email }
+      responses:
+        "201":
+          description: user created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: integer }
+                  login: { type: string }
+                  email: { type: string }
+
+  /api/login:
+    post:
+      summary: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email,password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        "200":
+          description: token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  token_type: { type: string }
+                  expires_in: { type: integer }
+
+  /api/upload-document:
+    post:
+      summary: upload-document
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file,name]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+      responses:
+        "201":
+          description: uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  name: { type: string }
+                  creation: { type: string, format: date-time }
+                  sha256: { type: string }
+                  size: { type: integer }
+
+  /api/list-documents:
+    get:
+      summary: list-documents
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  documents:
+                    type: array
+                    items:
+                      type: object
+
+  /api/list-versions:
+    get:
+      summary: list-versions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: documentid
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  versions:
+                    type: array
+                    items:
+                      type: object
+
+  /api/get-document/{document_id}:
+    get:
+      summary: get-document by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: PDF binary
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /api/get-watermarking-methods:
+    get:
+      summary: get-watermarking-methods
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  methods:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        description: { type: string }
+                        name: { type: string }
+
+  /api/read-watermark:
+    post:
+      summary: read-watermark
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                method: { type: string }
+                position: { type: string }
+                key: { type: string }
+                id: { type: integer }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/create-watermark:
+    post:
+      summary: create-watermark
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                method: { type: string }
+                position: { type: string }
+                key: { type: string }
+                secret: { type: string }
+                intended_for: { type: string }
+                id: { type: integer }
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/delete-document:
+    delete:
+      summary: delete-document
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: document_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: deleted
+
+  /api/rmap-initiate:
+    post:
+      summary: rmap-initiate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload: { type: string }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload: { type: string }
+
+  /api/rmap-get-link:
+    post:
+      summary: rmap-get-link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload: { type: string }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload: { type: string }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
