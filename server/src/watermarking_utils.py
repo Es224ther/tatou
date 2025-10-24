@@ -42,7 +42,8 @@ from watermarking_method import (
     load_pdf_bytes,
 )
 from add_after_eof import AddAfterEOF
-from unsafe_bash_bridge_append_eof import UnsafeBashBridgeAppendEOF
+#from unsafe_bash_bridge_append_eof import UnsafeBashBridgeAppendEOF
+#removed: command injection risk
 from invisible_text_watermark import InvisibleTextWatermark
 from embed_attachment import EmbedAttachment
 from xmp_metadata_method import XmpMetadataMethod
@@ -52,7 +53,6 @@ from xmp_metadata_method import XmpMetadataMethod
 
 METHODS: Dict[str, WatermarkingMethod] = {
     AddAfterEOF.name: AddAfterEOF(),
-    UnsafeBashBridgeAppendEOF.name: UnsafeBashBridgeAppendEOF(),
     InvisibleTextWatermark.name: InvisibleTextWatermark(),
     EmbedAttachment.name:EmbedAttachment(),
     XmpMetadataMethod.name:XmpMetadataMethod(),

@@ -1,5 +1,3 @@
-
-
 services:
   server:
     env_file:
@@ -11,9 +9,17 @@ services:
       - "5000:5000"
     volumes:
       - user-files:/app/storage
-      - ./deploy/secrets/flag2:/app/flag:ro
+      - ./deploy/secrets:/app/flags
       - ./deploy/secrets/clients:/app/secrets/clients:ro
       - ./deploy/secrets/server:/app/secrets/server:ro
+      - ./logs:/app/logs
+      - ./flag_backups:/app/flag_backups
+      - ./server/ops:/app/server/ops
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
     environment:
       - PYTHONUNBUFFERED=1
       # DB connection details for future use by the API
@@ -25,6 +31,7 @@ services:
       - RMAP_SERVER_PRIVATE=/app/secrets/server/server_priv.asc
       - RMAP_SERVER_PUBLIC=/app/secrets/server/server_pub.asc
       - RMAP_CLIENT_KEYS_DIR=/app/secrets/clients
+      - APP_LOG_FILE=/app/logs/app.log
     depends_on:
       db:
         condition: service_healthy

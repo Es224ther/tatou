@@ -1,78 +1,191 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
-  title: Tatou API (derived)
+  title: Tatou API (auto-generated from API.md)
   version: "1.0.0"
+  description: "OpenAPI v3 translation of supplied API.md. Some types were assumed conservatively where unspecified."
+
 servers:
   - url: http://127.0.0.1:5000
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+    CreateUserRequest:
+      type: object
+      required: ["login","password","email"]
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+          format: email
+
+    CreateUserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        email:
+          type: string
+      required: ["id","login","email"]
+
+    LoginRequest:
+      type: object
+      required: ["email","password"]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+
+    DocumentMeta:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        creation: { type: string, format: date-time }
+        sha256: { type: string }
+        size: { type: integer }
+
+    ListDocumentsResponse:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentMeta'
+
+    ListVersionsResponse:
+      type: object
+      properties:
+        versions:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              documentid: { type: string }
+              link: { type: string }
+              intended_for: { type: string }
+              secret: { type: string }
+              method: { type: string }
+
+    WatermarkCreateRequest:
+      type: object
+      properties:
+        method: { type: string }
+        position: { type: string }
+        key: { type: string }
+        secret: { type: string }
+        intended_for: { type: string }
+        id: { type: integer }
+
+    ReadWatermarkRequest:
+      type: object
+      properties:
+        method: { type: string }
+        position: { type: string }
+        key: { type: string }
+        id: { type: integer }
+
+    RmapPayload:
+      type: object
+      properties:
+        payload:
+          type: string
+          description: ASCII-armored-base64 (GPG encrypted message)
+
 paths:
-  /api/healthz:
+
+  /healthz:
     get:
-      summary: healthz
+      summary: Health check
       responses:
-        "200":
-          description: ok
+        '200':
+          description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
+                  message: { type: string }
 
   /api/create-user:
     post:
-      summary: create-user
+      summary: Create user
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [login,password,email]
-              properties:
-                login: { type: string }
-                password: { type: string }
-                email: { type: string, format: email }
+              $ref: '#/components/schemas/CreateUserRequest'
       responses:
-        "201":
-          description: user created
+        '201':
+          description: Created
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id: { type: integer }
-                  login: { type: string }
-                  email: { type: string }
+                $ref: '#/components/schemas/CreateUserResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      # NOTE: creation is stateful. Schemathesis tests will skip this by default unless ALLOW_CREATE=1
 
   /api/login:
     post:
-      summary: login
+      summary: Login
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [email,password]
-              properties:
-                email: { type: string }
-                password: { type: string }
+              $ref: '#/components/schemas/LoginRequest'
       responses:
-        "200":
-          description: token
+        '200':
+          description: token issued
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  token: { type: string }
-                  token_type: { type: string }
-                  expires_in: { type: integer }
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /api/upload-document:
     post:
-      summary: upload-document
+      summary: Upload PDF
       security:
         - bearerAuth: []
       requestBody:
@@ -81,7 +194,7 @@ paths:
           multipart/form-data:
             schema:
               type: object
-              required: [file,name]
+              required: ["file","name"]
               properties:
                 file:
                   type: string
@@ -89,83 +202,130 @@ paths:
                 name:
                   type: string
       responses:
-        "201":
-          description: uploaded
+        '201':
+          description: Uploaded
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id: { type: string }
-                  name: { type: string }
-                  creation: { type: string, format: date-time }
-                  sha256: { type: string }
-                  size: { type: integer }
+                $ref: '#/components/schemas/DocumentMeta'
+        '400':
+          description: Bad Request
+        '415':
+          description: Unsupported Media Type
 
   /api/list-documents:
     get:
-      summary: list-documents
+      summary: List documents
       security:
         - bearerAuth: []
       responses:
-        "200":
+        '200':
+          description: ok
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  documents:
-                    type: array
-                    items:
-                      type: object
+                $ref: '#/components/schemas/ListDocumentsResponse'
 
   /api/list-versions:
     get:
-      summary: list-versions
+      summary: List versions (query param documentid)
       security:
         - bearerAuth: []
       parameters:
-        - name: documentid
-          in: query
+        - in: query
+          name: documentid
           schema:
             type: integer
       responses:
-        "200":
+        '200':
+          description: OK
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  versions:
-                    type: array
-                    items:
-                      type: object
+                $ref: '#/components/schemas/ListVersionsResponse'
 
-  /api/get-document/{document_id}:
+  /api/list-versions/{document_id}:
     get:
-      summary: get-document by id
+      summary: List versions by document id (path)
       security:
         - bearerAuth: []
       parameters:
-        - name: document_id
-          in: path
+        - in: path
+          name: document_id
           required: true
           schema:
             type: integer
       responses:
-        "200":
-          description: PDF binary
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListVersionsResponse'
+
+  /api/get-document:
+    get:
+      summary: Get document by query param id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: PDF file
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
 
+  /api/get-document/{document_id}:
+    get:
+      summary: Get document by path id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: document_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: PDF file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /api/get-version/{link}:
+    get:
+      summary: Get version by link
+      parameters:
+        - in: path
+          name: link
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: redirect or content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  link: { type: string }
+
   /api/get-watermarking-methods:
     get:
-      summary: get-watermarking-methods
+      summary: List watermarking methods
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
@@ -182,7 +342,7 @@ paths:
 
   /api/read-watermark:
     post:
-      summary: read-watermark
+      summary: Read watermark (query)
       security:
         - bearerAuth: []
       requestBody:
@@ -190,101 +350,166 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                method: { type: string }
-                position: { type: string }
-                key: { type: string }
-                id: { type: integer }
+              $ref: '#/components/schemas/ReadWatermarkRequest'
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
                 type: object
+                properties:
+                  documentid: { type: integer }
+                  secret: { type: string }
+                  method: { type: string }
+                  position: { type: string }
 
-  /api/create-watermark:
+  /api/read-watermark/{document_id}:
     post:
-      summary: create-watermark
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                method: { type: string }
-                position: { type: string }
-                key: { type: string }
-                secret: { type: string }
-                intended_for: { type: string }
-                id: { type: integer }
-      responses:
-        "201":
-          content:
-            application/json:
-              schema:
-                type: object
-
-  /api/delete-document:
-    delete:
-      summary: delete-document
+      summary: Read watermark for document id (path)
       security:
         - bearerAuth: []
       parameters:
-        - name: document_id
-          in: query
+        - in: path
+          name: document_id
+          required: true
           schema:
             type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                method: { type: string }
+                position: { type: string }
+                key: { type: string }
       responses:
-        "204":
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  documentid: { type: integer }
+                  secret: { type: string }
+                  method: { type: string }
+                  position: { type: string }
+
+  /api/create-watermark:
+    post:
+      summary: Create watermark (body includes id optional)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WatermarkCreateRequest'
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: integer }
+                  documentid: { type: integer }
+                  link: { type: string }
+                  intended_for: { type: string }
+                  method: { type: string }
+                  position: { type: string }
+                  filename: { type: string }
+                  size: { type: integer }
+
+  /api/create-watermark/{document_id}:
+    post:
+      summary: Create watermark for path document id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: document_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WatermarkCreateRequest'
+      responses:
+        '201':
+          description: created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WatermarkCreateRequest'
+
+  /api/delete-document:
+    delete:
+      summary: Delete document (body mode)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                document_id:
+                  type: integer
+      responses:
+        '204':
+          description: deleted
+
+  /api/delete-document/{document_id}:
+    delete:
+      summary: Delete by path id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: document_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
           description: deleted
 
   /api/rmap-initiate:
     post:
-      summary: rmap-initiate
+      summary: RMAP initiate
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                payload: { type: string }
+              $ref: '#/components/schemas/RmapPayload'
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  payload: { type: string }
+                $ref: '#/components/schemas/RmapPayload'
 
   /api/rmap-get-link:
     post:
-      summary: rmap-get-link
+      summary: RMAP get link
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                payload: { type: string }
+              $ref: '#/components/schemas/RmapPayload'
       responses:
-        "200":
+        '200':
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  payload: { type: string }
-
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+                $ref: '#/components/schemas/RmapPayload'
