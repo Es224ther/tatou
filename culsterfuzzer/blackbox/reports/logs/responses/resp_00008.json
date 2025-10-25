@@ -1,0 +1,17 @@
+{
+  "index": 8,
+  "payload": "{\"email\": \"alice@example.com\", \"login\": \"alice\", \"password\": \"P@ssw0rd!<script>alert(1)</script>\"}",
+  "recorded_at": "2025-10-25T13:30:42.323+02:00",
+  "response": {
+    "status": 409,
+    "headers": {
+      "Server": "gunicorn",
+      "Date": "Sat, 25 Oct 2025 11:30:42 GMT",
+      "Connection": "close",
+      "Content-Type": "application/json",
+      "Content-Length": "42",
+      "X-Request-ID": "f9c323fc-dae1-4ae6-a398-bb408aedb965"
+    },
+    "body_text_preview": "{\"error\":\"email or login already exists\"}\n"
+  }
+}

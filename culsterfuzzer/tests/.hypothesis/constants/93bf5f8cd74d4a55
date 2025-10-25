@@ -1,0 +1,4 @@
+# file: /home/lab/tatou/culsterfuzzer/.venv/bin/pytest
+# hypothesis_version: 6.142.3
+
+['.exe', '__main__']

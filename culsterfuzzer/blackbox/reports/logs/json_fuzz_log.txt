@@ -1,0 +1,102 @@
+ts	index	status	resp_len_or_error	payload
+1761261005	0	401	32	test@example.com
+1761261006	1	401	32	"""test@example.comtest@example.com"""
+1761261006	2	401	32	test@@example.com
+1761261006	3	401	32	"test@ex""ample.com"
+1761261006	4	401	32	test@exam\nple.com
+1761261006	5	401	32	test@例子.公司
+1761261006	6	401	32	test@☃.net
+1761261006	7	401	32	test@localhost
+1761261007	8	401	32	test@127.0.0.1
+1761261007	9	401	32	user@%s.com
+1761261007	10	401	32	user@{{7*7}}.com
+1761261007	11	401	32	user@<script>alert(1)</script>.com
+1761261007	12	401	32	user@' OR '1'='1
+1761261007	13	401	32	user@admin'--
+1761261007	14	401	32	user@../../../../etc/passwd
+1761261007	15	401	32	user@NULL
+1761261007	16	401	32	user@None
+1761261008	17	401	32	user@
+1761261008	18	401	32	12345
+1761261008	19	401	32	<xml>
+1761261008	20	401	32	空
+1761261008	21	401	32	null
+1761261008	22	401	32	🧨🧨🧨
+2025-10-24T01:12:45.580+02:00	1761261165	0	401	32	"{""error"":""invalid credentials""}\n"		test@example.com	application/json	
+2025-10-24T01:12:45.803+02:00	1761261165	1	401	32	"{""error"":""invalid credentials""}\n"		"""test@example.comtest@example.com"""	application/json	
+2025-10-24T01:12:45.909+02:00	1761261165	2	401	32	"{""error"":""invalid credentials""}\n"		test@@example.com	application/json	
+2025-10-24T01:12:46.016+02:00	1761261166	3	401	32	"{""error"":""invalid credentials""}\n"		"test@ex""ample.com"	application/json	
+2025-10-24T01:12:46.122+02:00	1761261166	4	401	32	"{""error"":""invalid credentials""}\n"		test@exam\nple.com	application/json	
+2025-10-24T01:12:46.228+02:00	1761261166	5	401	32	"{""error"":""invalid credentials""}\n"		test@例子.公司	application/json	
+2025-10-24T01:12:46.334+02:00	1761261166	6	401	32	"{""error"":""invalid credentials""}\n"		test@☃.net	application/json	
+2025-10-24T01:12:46.439+02:00	1761261166	7	401	32	"{""error"":""invalid credentials""}\n"		test@localhost	application/json	
+2025-10-24T01:12:46.545+02:00	1761261166	8	401	32	"{""error"":""invalid credentials""}\n"		test@127.0.0.1	application/json	
+2025-10-24T01:12:46.650+02:00	1761261166	9	401	32	"{""error"":""invalid credentials""}\n"		user@%s.com	application/json	
+2025-10-24T01:12:46.756+02:00	1761261166	10	401	32	"{""error"":""invalid credentials""}\n"		user@{{7*7}}.com	application/json	
+2025-10-24T01:12:46.861+02:00	1761261166	11	401	32	"{""error"":""invalid credentials""}\n"		user@<script>alert(1)</script>.com	application/json	
+2025-10-24T01:12:46.967+02:00	1761261166	12	401	32	"{""error"":""invalid credentials""}\n"		user@' OR '1'='1	application/json	
+2025-10-24T01:12:47.072+02:00	1761261167	13	401	32	"{""error"":""invalid credentials""}\n"		user@admin'--	application/json	
+2025-10-24T01:12:47.178+02:00	1761261167	14	401	32	"{""error"":""invalid credentials""}\n"		user@../../../../etc/passwd	application/json	
+2025-10-24T01:12:47.283+02:00	1761261167	15	401	32	"{""error"":""invalid credentials""}\n"		user@NULL	application/json	
+2025-10-24T01:12:47.388+02:00	1761261167	16	401	32	"{""error"":""invalid credentials""}\n"		user@None	application/json	
+2025-10-24T01:12:47.493+02:00	1761261167	17	401	32	"{""error"":""invalid credentials""}\n"		user@	application/json	
+2025-10-24T01:12:47.598+02:00	1761261167	18	401	32	"{""error"":""invalid credentials""}\n"		12345	application/json	
+2025-10-24T01:12:47.703+02:00	1761261167	19	401	32	"{""error"":""invalid credentials""}\n"		<xml>	application/json	
+2025-10-24T01:12:47.809+02:00	1761261167	20	401	32	"{""error"":""invalid credentials""}\n"		空	application/json	
+2025-10-24T01:12:47.914+02:00	1761261167	21	401	32	"{""error"":""invalid credentials""}\n"		null	application/json	
+2025-10-24T01:12:48.020+02:00	1761261168	22	401	32	"{""error"":""invalid credentials""}\n"		🧨🧨🧨	application/json	
+2025-10-25T13:12:11.714+02:00	1761390731	0	400	52	"{""error"":""email, login, and password are required""}\n"		{}	application/json	
+2025-10-25T13:21:36.246+02:00	1761391296	0	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.com""}"	application/json	
+2025-10-25T13:21:36.352+02:00	1761391296	1	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@examqle.com""}"	application/json	
+2025-10-25T13:21:36.456+02:00	1761391296	2	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.com​☃""}"	application/json	
+2025-10-25T13:21:36.561+02:00	1761391296	3	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""aliceexample.com""}"	application/json	
+2025-10-25T13:21:36.665+02:00	1761391296	4	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@ex""}"	application/json	
+2025-10-25T13:21:36.769+02:00	1761391296	5	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@ex""}"	application/json	
+2025-10-25T13:21:36.874+02:00	1761391296	6	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""a.ice@example.com""}"	application/json	
+2025-10-25T13:21:36.980+02:00	1761391296	7	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.com​☃""}"	application/json	
+2025-10-25T13:21:37.085+02:00	1761391297	8	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.comalice@example.com""}"	application/json	
+2025-10-25T13:21:37.189+02:00	1761391297	9	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.com​☃""}"	application/json	
+2025-10-25T13:21:37.293+02:00	1761391297	10	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alide@example.com""}"	application/json	
+2025-10-25T13:21:37.397+02:00	1761391297	11	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.com​☃""}"	application/json	
+2025-10-25T13:21:37.502+02:00	1761391297	12	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@examle.com""}"	application/json	
+2025-10-25T13:21:37.606+02:00	1761391297	13	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.com' OR '1'='1""}"	application/json	
+2025-10-25T13:21:37.713+02:00	1761391297	14	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.com' OR '1'='1""}"	application/json	
+2025-10-25T13:21:37.817+02:00	1761391297	15	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.comalice@example.com""}"	application/json	
+2025-10-25T13:21:37.922+02:00	1761391297	16	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.com​☃""}"	application/json	
+2025-10-25T13:21:38.026+02:00	1761391298	17	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.com<script>alert(1)</script>""}"	application/json	
+2025-10-25T13:21:38.130+02:00	1761391298	18	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""aliVce@example.com""}"	application/json	
+2025-10-25T13:21:38.234+02:00	1761391298	19	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@example.co_""}"	application/json	
+2025-10-25T13:21:38.338+02:00	1761391298	20	400	52	"{""error"":""email, login, and password are required""}\n"		"{""email"": ""alice@eyample.com""}"	application/json	
+2025-10-25T13:24:08.418+02:00	1761391448	0	201	56	"{""email"":""alice@example.com"",""id"":7122,""login"":""alice""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:24:08.647+02:00	1761391448	1	201	81	"{""email"":""alice@example.com<script>alert(1)</script>"",""id"":7123,""login"":""alice""}\n"		"{""email"": ""alice@example.com<script>alert(1)</script>"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:24:08.871+02:00	1761391448	2	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""P@ss""}"	application/json	
+2025-10-25T13:24:09.088+02:00	1761391449	3	201	155	"{""email"":""alice@example.comaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"",""id"":7125,""login"":""alice""}\n"		"{""email"": ""alice@example.comAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:24:09.311+02:00	1761391449	4	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alicealice"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:24:09.527+02:00	1761391449	5	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""blice"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:24:09.746+02:00	1761391449	6	201	183	"{""email"":""alice@example.comaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"",""id"":7128,""login"":""alice""}\n"		"{""email"": ""alice@example.comAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:24:09.967+02:00	1761391449	7	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""P@ss""}"	application/json	
+2025-10-25T13:24:10.220+02:00	1761391450	8	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA""}"	application/json	
+2025-10-25T13:24:10.477+02:00	1761391450	9	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice' OR '1'='1"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:24:10.702+02:00	1761391450	10	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""P@xssw0rd!""}"	application/json	
+2025-10-25T13:27:57.205+02:00	1761391677	0	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:27:57.421+02:00	1761391677	1	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice1"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:27:57.636+02:00	1761391677	2	201	81	"{""email"":""alice<script>alert(1)</script>@example.com"",""id"":7135,""login"":""alice""}\n"		"{""email"": ""alice<script>alert(1)</script>@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:27:57.853+02:00	1761391677	3	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!!""}"	application/json	
+2025-10-25T13:27:58.069+02:00	1761391678	4	201	67	"{""email"":""alice' or '1'='1@example.com"",""id"":7137,""login"":""alice""}\n"		"{""email"": ""alice' OR '1'='1@example.com"", ""login"": ""alice"", ""password"": ""qwerty""}"	application/json	
+2025-10-25T13:27:58.284+02:00	1761391678	5	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""123456""}"	application/json	
+2025-10-25T13:27:58.501+02:00	1761391678	6	201	60	"{""email"":""\""alice\""@example.com"",""id"":7139,""login"":""alice""}\n"		"{""email"": ""\""alice\""@example.com"", ""login"": ""alice"", ""password"": ""abc123""}"	application/json	
+2025-10-25T13:27:58.717+02:00	1761391678	7	201	60	"{""email"":""alice.alt@example.com"",""id"":7140,""login"":""alice""}\n"		"{""email"": ""alice.alt@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!\u0000""}"	application/json	
+2025-10-25T13:27:58.935+02:00	1761391678	8	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"	application/json	
+2025-10-25T13:27:59.154+02:00	1761391679	9	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""abc123""}"	application/json	
+2025-10-25T13:27:59.373+02:00	1761391679	10	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""\""alice\""@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!P@ssw0rd!""}"	application/json	
+2025-10-25T13:30:40.989+02:00	1761391840	0	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"		application/json	
+2025-10-25T13:30:41.155+02:00	1761391841	1	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""álice@example.com"", ""login"": ""alice1"", ""password"": ""P@ssw0rd!""}"		application/json	
+2025-10-25T13:30:41.321+02:00	1761391841	2	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""ecila"", ""password"": ""P@ssw0rd!""}"		application/json	
+2025-10-25T13:30:41.490+02:00	1761391841	3	201	51	"{""email"":""@example.com"",""id"":7147,""login"":""alice""}\n"		"{""email"": ""@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"		application/json	
+2025-10-25T13:30:41.656+02:00	1761391841	4	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""\""alice\""@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"		application/json	
+2025-10-25T13:30:41.821+02:00	1761391841	5	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""password1""}"		application/json	
+2025-10-25T13:30:41.991+02:00	1761391841	6	201	61	"{""email"":""alice+test@example.com"",""id"":7150,""login"":""alice""}\n"		"{""email"": ""alice+test@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"		application/json	
+2025-10-25T13:30:42.158+02:00	1761391842	7	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice<script>alert(1)</script>@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!""}"		application/json	
+2025-10-25T13:30:42.324+02:00	1761391842	8	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""P@ssw0rd!<script>alert(1)</script>""}"		application/json	
+2025-10-25T13:30:42.489+02:00	1761391842	9	409	42	"{""error"":""email or login already exists""}\n"		"{""email"": ""alice@example.com"", ""login"": ""alice"", ""password"": ""letmein""}"		application/json	
+2025-10-25T13:30:42.658+02:00	1761391842	10	201	256	"{""email"":""aliceaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@example.com"",""id"":7154,""login"":""alice""}\n"		"{""email"": ""aliceAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA@example.com"", ""login"": ""alice"", ""password"": ""admin""}"		application/json	

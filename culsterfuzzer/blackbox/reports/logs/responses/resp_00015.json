@@ -1,0 +1,17 @@
+{
+  "index": 15,
+  "payload": "{\"email\": \"alice@example.comalice@example.com\"}",
+  "recorded_at": "2025-10-25T13:21:37.821+02:00",
+  "response": {
+    "status": 400,
+    "headers": {
+      "Server": "gunicorn",
+      "Date": "Sat, 25 Oct 2025 11:21:37 GMT",
+      "Connection": "close",
+      "Content-Type": "application/json",
+      "Content-Length": "52",
+      "X-Request-ID": "faa68bdc-5bfa-4021-b3c8-7c43a7e92d3b"
+    },
+    "body_text_preview": "{\"error\":\"email, login, and password are required\"}\n"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "index": 3,
+  "payload": "{\"email\": \"@example.com\", \"login\": \"alice\", \"password\": \"P@ssw0rd!\"}",
+  "recorded_at": "2025-10-25T13:30:41.490+02:00",
+  "response": {
+    "status": 201,
+    "headers": {
+      "Server": "gunicorn",
+      "Date": "Sat, 25 Oct 2025 11:30:41 GMT",
+      "Connection": "close",
+      "Content-Type": "application/json",
+      "Content-Length": "51",
+      "X-Request-ID": "85408f4c-e12a-45f4-82a6-f4a944e8d58d"
+    },
+    "body_text_preview": "{\"email\":\"@example.com\",\"id\":7147,\"login\":\"alice\"}\n"
+  }
+}
