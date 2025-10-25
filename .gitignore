@@ -220,7 +220,7 @@ tatou/server/flag
 deploy/secrets/**
 **/secrets/**
 *.asc
-
+tatou/flag_backups
 # --- Python junk ---
 __pycache__/
 *.py[cod]
